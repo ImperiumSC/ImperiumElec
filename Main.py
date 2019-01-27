@@ -43,6 +43,7 @@ def initialize_pygame():
 
 
 def fill_circle_segment_in_between(screen, midpoint, inner_radius, outer_radius, degrees, steps, color, start_angle=-1, end_angle=-1):
+    lw = 25
     if start_angle==-1 and end_angle == -1:
         start_angle = math.floor(360-90-degrees/2-180)
         end_angle = math.ceil(360-90+degrees/2-180)
@@ -52,7 +53,7 @@ def fill_circle_segment_in_between(screen, midpoint, inner_radius, outer_radius,
             angle_radians = angle_degrees * math.pi / 180
             start_xy = (int((inner_radius+1)*math.cos(angle_radians)+mid_x), int((inner_radius+1)*math.sin(angle_radians))+mid_y)
             end_xy = (int((outer_radius+1)*math.cos(angle_radians))+mid_x, int((outer_radius+1)*math.sin(angle_radians))+mid_y)
-            pygame.draw.line(screen, color, start_xy, end_xy, 2)
+            pygame.draw.line(screen, color, start_xy, end_xy, lw)
     else:
         mid_x = midpoint[0]
         mid_y = midpoint[1]
@@ -64,7 +65,7 @@ def fill_circle_segment_in_between(screen, midpoint, inner_radius, outer_radius,
                         int((inner_radius + 1) * math.sin(angle_radians)) + mid_y)
             end_xy = (int((outer_radius + 1) * math.cos(angle_radians)) + mid_x,
                       int((outer_radius + 1) * math.sin(angle_radians)) + mid_y)
-            pygame.draw.line(screen, color, start_xy, end_xy, 2)
+            pygame.draw.line(screen, color, start_xy, end_xy, lw)
 
 
 def draw_initial_gui(screen):
@@ -98,10 +99,10 @@ def draw_initial_gui(screen):
     fill_circle_segment_in_between(screen, display_midpoint_tuple,
                                    int(center_circle_radius * center_circle_radius_ratio),
                                    int(center_circle_radius - center_circle_width), 360,
-                                   int(5000 / 75 * 360), TRON_EVIL_ORANGE)
+                                   400, TRON_EVIL_ORANGE)
     fill_circle_segment_in_between(screen, display_midpoint_tuple, int(center_circle_radius*center_circle_radius_ratio),
                                    int(center_circle_radius-center_circle_width), bottom_center_segment_width,
-                                   5000, HALF_BRIGHT_TRON_BLUE)
+                                   200, HALF_BRIGHT_TRON_BLUE)
     speed_tuple = speedometer_percentage(bottom_center_segment_width, 85)
     charge_tuple = chargeometer(bottom_center_segment_width, 45)
     # fill_circle_segment_in_between(screen, display_midpoint_tuple, int(center_circle_radius*center_circle_radius_ratio),
@@ -109,11 +110,11 @@ def draw_initial_gui(screen):
     #                                -90+bottom_center_segment_width/2, 90)
     fill_circle_segment_in_between(screen, display_midpoint_tuple,
                                    int(center_circle_radius * center_circle_radius_ratio),
-                                   int(center_circle_radius - center_circle_width), -1, 5000, GREEN,
+                                   int(center_circle_radius - center_circle_width), -1, 200, GREEN,
                                    speed_tuple[0], speed_tuple[1])
     fill_circle_segment_in_between(screen, display_midpoint_tuple,
                                    int(center_circle_radius * center_circle_radius_ratio),
-                                   int(center_circle_radius - center_circle_width), -1, 5000, RED,
+                                   int(center_circle_radius - center_circle_width), -1, 200, RED,
                                    charge_tuple[0], charge_tuple[1])
 
 
@@ -183,8 +184,10 @@ def conditional_print(s):
 
 def main():
     screen = initialize_pygame()
+    init = time.process_time_ns()
     draw_initial_gui(screen)
     # Debugging statement -- to allow viewer to view initial screen before quitting
+    print(time.process_time_ns()-init)
     while True:
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
