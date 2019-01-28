@@ -184,10 +184,10 @@ def conditional_print(s):
 
 def main():
     screen = initialize_pygame()
-    init = time.process_time_ns()
+    init = time.process_time()
     draw_initial_gui(screen)
     # Debugging statement -- to allow viewer to view initial screen before quitting
-    print(time.process_time_ns()-init)
+    print(time.process_time()-init)
     while True:
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
