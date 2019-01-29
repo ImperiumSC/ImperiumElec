@@ -53,8 +53,9 @@ def fill_circle_segment_in_between(screen, midpoint, inner_radius, outer_radius,
         start_angle = math.floor(360 - 90 - degrees / 2 - 180)
         end_angle = math.ceil(360 - 90 + degrees / 2 - 180)
     else:
-        start_angle = start_angle - 180
-        end_angle = end_angle - 180
+        # start_angle = start_angle - 180
+        # end_angle = end_angle - 180
+        pass
     mid_x = midpoint[0]
     mid_y = midpoint[1]
     start_angle = start_angle - 180
@@ -68,7 +69,7 @@ def fill_circle_segment_in_between(screen, midpoint, inner_radius, outer_radius,
         pygame.draw.line(screen, color, start_xy, end_xy, lw)
 
 
-def draw_initial_gui(screen):
+def draw_initial_gui(screen, speed=45, charge=50):
     # Get current display information, to allow for adaptive GUI.
     current_display_info = pygame.display.Info()
     display_width, display_height = current_display_info.current_w, current_display_info.current_h
@@ -80,43 +81,59 @@ def draw_initial_gui(screen):
     conditional_print("display midpoint = " + str(display_midpoint_tuple))
     # Test statement, prints display size.
     # Main Gauge (center-of-screen)
-    # pygame.draw.circle(display_surface, (color tuple), (center-position tuple), radius/diameter???, line width)
     center_circle_radius = math.floor(min(display_width, display_height) / 2)
-    center_circle_width = math.floor(0.02315 * 2 * center_circle_radius)
-    center_circle_radius_ratio = 0.8
-    pygame.draw.circle(screen, MAIN_GAUGE_COLOR, display_midpoint_tuple, center_circle_radius,
-                       center_circle_width)  # math.floor(min(display_width, display_height)/2)
+    center_circle_width = math.floor(0.02315 * 2 * center_circle_radius)  # width of curve creating circle
+    center_circle_radius_ratio = 0.8  # How big should the inner circle be, with respect to outer circle
+    pygame.draw.circle(screen, MAIN_GAUGE_COLOR, display_midpoint_tuple, center_circle_radius, center_circle_width)
     draw_tron_center_circle(screen, center_circle_radius - center_circle_width, center_circle_radius,
                             display_midpoint_tuple)
-    pygame.draw.circle(screen, MAIN_GAUGE_COLOR, display_midpoint_tuple, int(center_circle_radius_ratio *
-                                                                             center_circle_radius),
-                       center_circle_width)
+    # Draw the outer circle.
+    # 1) A plain circle, to ensure anti-aliasing and stuff doesn't ruin the effect
+    # 2) Draw progressively smaller circles
+    pygame.draw.circle(screen, MAIN_GAUGE_COLOR, display_midpoint_tuple,
+                       int(center_circle_radius_ratio * center_circle_radius), center_circle_width)
     draw_tron_center_circle(screen,
                             int(center_circle_radius * center_circle_radius_ratio - center_circle_width),
                             int(center_circle_radius_ratio * center_circle_radius),
                             display_midpoint_tuple)
     bottom_center_segment_width = 75
-    fill_circle_segment_in_between(screen, display_midpoint_tuple,
-                                   int(center_circle_radius * center_circle_radius_ratio),
-                                   int(center_circle_radius - center_circle_width), 360,
-                                   400, TRON_EVIL_ORANGE)
-    fill_circle_segment_in_between(screen, display_midpoint_tuple,
-                                   int(center_circle_radius * center_circle_radius_ratio),
-                                   int(center_circle_radius - center_circle_width), bottom_center_segment_width,
-                                   200, HALF_BRIGHT_TRON_BLUE)
-    speed_tuple = speedometer_percentage(bottom_center_segment_width, 85)
-    charge_tuple = chargeometer(bottom_center_segment_width, 45)
-    # fill_circle_segment_in_between(screen, display_midpoint_tuple, int(center_circle_radius*center_circle_radius_ratio),
-    #                                int(center_circle_radius-center_circle_width),-1, 5000, GREEN,
-    #                                -90+bottom_center_segment_width/2, 90)
-    fill_circle_segment_in_between(screen, display_midpoint_tuple,
-                                   int(center_circle_radius * center_circle_radius_ratio),
-                                   int(center_circle_radius - center_circle_width), -1, 200, GREEN,
-                                   speed_tuple[0], speed_tuple[1])
-    fill_circle_segment_in_between(screen, display_midpoint_tuple,
-                                   int(center_circle_radius * center_circle_radius_ratio),
-                                   int(center_circle_radius - center_circle_width), -1, 200, RED,
-                                   charge_tuple[0], charge_tuple[1])
+    # fill_circle_segment_in_between(screen, display_midpoint_tuple,
+    #                                int(center_circle_radius * center_circle_radius_ratio),
+    #                                int(center_circle_radius - center_circle_width), 360,
+    #                                400, TRON_EVIL_ORANGE)
+    pygame.draw.circle(screen, TRON_EVIL_ORANGE, display_midpoint_tuple, center_circle_radius - center_circle_width,
+                       center_circle_width)
+    # fill_circle_segment_in_between(screen, display_midpoint_tuple,
+    #                                int(center_circle_radius * center_circle_radius_ratio),
+    #                                int(center_circle_radius - center_circle_width), bottom_center_segment_width,
+    #                                200, HALF_BRIGHT_TRON_BLUE)
+    start_x_shading = int((
+                                      display_width - display_height + 2 * center_circle_width) / 2)  # (display_width - center_circle_radius) / 2 + center_circle_width/2
+    start_y_shading = center_circle_width
+    radius = center_circle_radius - center_circle_width
+    width = int(center_circle_radius - center_circle_radius_ratio * center_circle_radius - center_circle_width)
+    start_angle = math.radians(-90 + bottom_center_segment_width / 2)
+    charge_range = 180 - bottom_center_segment_width / 2
+    # charge = 20
+    end_angle = math.radians(charge_range * charge / 100 - 90 + bottom_center_segment_width / 2)
+    print(start_angle)
+    print(end_angle)
+    center_circle_segment_shade(screen, (start_x_shading, start_y_shading, radius * 2, radius * 2), BLUE, width,
+                                start_angle, end_angle)
+
+    # speed_tuple = speedometer(bottom_center_segment_width, speed)
+    # charge_tuple = chargeometer(bottom_center_segment_width, charge)
+    # # fill_circle_segment_in_between(screen, display_midpoint_tuple, int(center_circle_radius*center_circle_radius_ratio),
+    # #                                int(center_circle_radius-center_circle_width),-1, 5000, GREEN,
+    # #                                -90+bottom_center_segment_width/2, 90)
+    # fill_circle_segment_in_between(screen, display_midpoint_tuple,
+    #                                int(center_circle_radius * center_circle_radius_ratio),
+    #                                int(center_circle_radius - center_circle_width), -1, 200, GREEN,
+    #                                speed_tuple[0], speed_tuple[1])
+    # fill_circle_segment_in_between(screen, display_midpoint_tuple,
+    #                                int(center_circle_radius * center_circle_radius_ratio),
+    #                                int(center_circle_radius - center_circle_width), -1, 200, RED,
+    #                                charge_tuple[0], charge_tuple[1])
 
     # Debugging Statement
     conditional_print("Radius of Center Circle: " + str(center_circle_radius))
@@ -143,7 +160,7 @@ def draw_initial_gui(screen):
     return screen
 
 
-def speedometer_percentage(width, percentage):
+def speedometer(width, percentage):
     range = 90 - (-90 + width / 2)
     range = range * percentage / 100
     start = -90 + width / 2
@@ -157,6 +174,10 @@ def chargeometer(width, percentage):
     return meme
 
 
+def center_circle_segment_shade(screen, rect, color, width, start, end):
+    pygame.draw.arc(screen, color, rect, start, end, width)
+
+
 def draw_tron_center_circle(screen, radius_start, radius_end, midpoint_tuple):
     red_gradiant = 0.75
     bg_gradiant = 0.15
@@ -167,10 +188,13 @@ def draw_tron_center_circle(screen, radius_start, radius_end, midpoint_tuple):
     counter = 0
     for i in range(radius_start, radius_end, 1):
         pygame.draw.circle(screen, curr_color, midpoint_tuple, i, 1)
-
-        curr_color = (int(math.pow(math.sqrt(curr_color[0]) + red_gradiant, 2)),
-                      int(math.pow(math.sqrt(curr_color[1]) - bg_gradiant, 2)),
-                      int(math.pow(math.sqrt(curr_color[2]) - bg_gradiant, 2)))
+        temp_color = [0, 0, 0]
+        for j in range(3):
+            if j == 0:
+                temp_color[j] = int(math.pow(math.sqrt(curr_color[j]) + red_gradiant, 2))
+            else:
+                temp_color[j] = int(math.pow(math.sqrt(curr_color[j]) - bg_gradiant, 2))
+        curr_color = (temp_color[0], temp_color[1], temp_color[2])
 
 
 def conditional_print(s):
