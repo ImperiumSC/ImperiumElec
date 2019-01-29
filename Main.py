@@ -107,19 +107,8 @@ def draw_initial_gui(screen, speed=45, charge=50):
     #                                int(center_circle_radius * center_circle_radius_ratio),
     #                                int(center_circle_radius - center_circle_width), bottom_center_segment_width,
     #                                200, HALF_BRIGHT_TRON_BLUE)
-    start_x_shading = int((
-                                      display_width - display_height + 2 * center_circle_width) / 2)  # (display_width - center_circle_radius) / 2 + center_circle_width/2
-    start_y_shading = center_circle_width
-    radius = center_circle_radius - center_circle_width
-    width = int(center_circle_radius - center_circle_radius_ratio * center_circle_radius - center_circle_width)
-    start_angle = math.radians(-90 + bottom_center_segment_width / 2)
-    charge_range = 180 - bottom_center_segment_width / 2
-    # charge = 20
-    end_angle = math.radians(charge_range * charge / 100 - 90 + bottom_center_segment_width / 2)
-    print(start_angle)
-    print(end_angle)
-    center_circle_segment_shade(screen, (start_x_shading, start_y_shading, radius * 2, radius * 2), BLUE, width,
-                                start_angle, end_angle)
+    draw_power_consumption(bottom_center_segment_width, center_circle_radius, center_circle_radius_ratio,
+                           center_circle_width, charge, display_height, display_width, screen)
 
     # speed_tuple = speedometer(bottom_center_segment_width, speed)
     # charge_tuple = chargeometer(bottom_center_segment_width, charge)
@@ -158,6 +147,22 @@ def draw_initial_gui(screen, speed=45, charge=50):
     # # Keep this block of code at the end -- used for updating the display and returning the final display, as necessary
     pygame.display.update()
     return screen
+
+
+def draw_power_consumption(bottom_center_segment_width, center_circle_radius, center_circle_radius_ratio,
+                           center_circle_width, charge, display_height, display_width, screen):
+    start_x_shading = int((
+                                  display_width - display_height + 2 * center_circle_width) / 2)  # (display_width - center_circle_radius) / 2 + center_circle_width/2
+    start_y_shading = center_circle_width
+    radius = center_circle_radius - center_circle_width
+    width = int(center_circle_radius - center_circle_radius_ratio * center_circle_radius - center_circle_width)
+    start_angle = math.radians(-90 + bottom_center_segment_width / 2)
+    charge_range = 180 - bottom_center_segment_width / 2
+    end_angle = math.radians(charge_range * charge / 100 - 90 + bottom_center_segment_width / 2)
+    print(start_angle)
+    print(end_angle)
+    center_circle_segment_shade(screen, (start_x_shading, start_y_shading, radius * 2, radius * 2), BLUE, width,
+                                start_angle, end_angle)
 
 
 def speedometer(width, percentage):
