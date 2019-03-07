@@ -1,30 +1,43 @@
 void setup() {
-  // put your setup code here, to run once:
-  Serial.begin(9600);
-  pinMode(A0,INPUT);
-  pinMode(A1,INPUT);
-  pinMode(12, OUTPUT);
-  pinMode(13,OUTPUT);
+ 
+Serial.begin(9600);       //begin serial com at 9600 bps (bits)
+pinMode(A5, INPUT);
+pinMode(12, OUTPUT);
+pinMode(13, OUTPUT);      //enable internal pull up resistor to make those pins outputs
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-  float input = analogRead(A0);
-  float v0 = input * (5/1023);   //ADC converted input voltage
-  // we are going to have a two stage stepdown if we use this thing so the voltage division will be a little goofy
-  //which means that we can handle large voltages with ** Reasonable ** accuracy    I think it might be better for the arduino
-  //current-wise if we have a little more resistance between it and the main power supply   correct me if I'm wrong
-
-  //10x stepdown with a 90K (R1) resistor and a 10K (R2) resistor        attached to the 10K resistor is a 30K (R3) and 7.5K (R4) stepdown (5x)
-  int R1 = 90000;
-  int R2 = 10000;
-  int R3 = 30000;
-  int R4 = 7500;
-  float voltage;                                             //car's voltage 
- 
-  voltage = (((R1+R2)*(R3*R4)) / (R2*R4)) * v0;           //solving for the cars voltage based off of the input voltage
-  Serial.println(voltage);
   
+  int input = analogRead(A5);     //input the pin you're reading from. Signal voltage value
+  
+  //arduino board ADC reads voltages on a 0-1023 scale for 0-5V
+  float voltage = input * (5.0/1023.0);
+  Serial.print(voltage);
+  Serial.print("\t");
 
+  
+  //math to convert our voltage value to a current value      the equation is defined on the flexscada website
+  int CF = .0224;    // math constant for conversion of sensor
+  float current = (voltage - 2.5)/.0224;
+  Serial.println(current);
+
+
+//if(current > 40){                   // if the current gets above certain thresholds then light up two warning lights
+//  digitalWrite(12,HIGH);
+//  
+//}
+//if(current >= 50) {
+//  digitalWrite(13, HIGH);
+//    
+//  }
   
 }
+
+
+  /*
+  int voltage = 10;
+  int current = 5;
+  Serial.println(voltage);
+  Serial.println(current);
+  */
+  
