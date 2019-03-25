@@ -1,0 +1,2 @@
+CQB150W-110S ------Voltage Divider
+MSP 430 -----------Arduino Replacement 
