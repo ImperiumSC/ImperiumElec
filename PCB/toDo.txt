@@ -1,0 +1,2 @@
+Make a board that blinks and LED and test it with Eagle and SPICE
+Make voltage divider (stepdown) using CQB for the aux system
